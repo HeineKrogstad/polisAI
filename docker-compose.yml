@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5001"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - YANDEX_API_KEY=AQVN1-dqbkcvx68Hrv-edeaub_M8zaRemUMDcf3X
+      - YANDEX_FOLDER_ID=b1gb1ftmtfh3fviu2qas
+    depends_on:
+      - redis
+
+volumes:
+  redis_data: 
