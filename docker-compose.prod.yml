@@ -22,9 +22,7 @@ services:
       - "80"
     environment:
       - NODE_ENV=production
-      - REACT_APP_BACKEND_URL=https://polisai.ru/api
-    depends_on:
-      - backend
+      - REACT_APP_BACKEND_URL=/api
     restart: unless-stopped
 
   backend:
