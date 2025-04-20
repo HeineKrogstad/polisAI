@@ -8,7 +8,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - certbot_etc:/etc/nginx/ssl
+      - ./ssl:/etc/nginx/ssl
     depends_on:
       - frontend
       - backend
