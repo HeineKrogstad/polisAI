@@ -46,5 +46,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  redis_data:
-  certbot_etc: 
+  redis_data: 
