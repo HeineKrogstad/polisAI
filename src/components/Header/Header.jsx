@@ -12,12 +12,10 @@ import {
   ListItemIcon,
   ListItemText,
   useMediaQuery,
-  useTheme,
-  Divider
+  useTheme
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
-import CloseIcon from '@mui/icons-material/Close';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import HomeIcon from '@mui/icons-material/Home';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';

@@ -75,14 +75,13 @@ export default function Footer () {
             </Box>
 
             <Box sx={{ 
-              display: 'grid',
+              display: { xs: 'grid', sm: 'flex' },
               gridTemplateColumns: { xs: 'repeat(3, 1fr)', sm: 'none' },
               gridTemplateRows: { xs: 'repeat(2, auto)', sm: 'none' },
               gap: { xs: 2, sm: 3 },
               justifyContent: 'center',
               maxWidth: { xs: '300px', sm: 'none' },
-              margin: '0 auto',
-              display: { xs: 'grid', sm: 'flex' }
+              margin: '0 auto'
             }}>
               {MAIN_MENU_ITEMS.map((item) => (
                 <Typography

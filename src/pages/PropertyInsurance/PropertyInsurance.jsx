@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import PolisBuilder from '../../components/PolisBuilder/polisBuilder';
 import { Chat } from '../../components/Chat';
 

@@ -17,15 +17,20 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     expose:
       - "80"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_BACKEND_URL=https://polisai.ru/api
     depends_on:
       - backend
     restart: unless-stopped
 
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     expose:
       - "5001"
     environment:
