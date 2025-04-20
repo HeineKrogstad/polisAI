@@ -32,7 +32,6 @@ const ProductButton = ({ title, path, Icon }) => {
             transform: 'translateY(-4px)',
             boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.3)'
           },
-          width: '200px',
           height: '160px',
           gap: 2
         })

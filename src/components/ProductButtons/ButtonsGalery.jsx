@@ -48,10 +48,11 @@ const ButtonsGalery = () => {
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, 1fr)',
         gap: isMobile ? 3 : 2,
         justifyContent: 'center',
-        maxWidth: isMobile ? '100%' : '1200px',
+        width: '100%',
+        maxWidth: '100%',
         margin: '0 auto',
         px: isMobile ? 3 : 2,
         py: 2

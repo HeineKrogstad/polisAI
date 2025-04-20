@@ -152,7 +152,9 @@ export default function Home() {
             borderRadius: '20px',
             p: 4,
             position: 'relative',
-            zIndex: 2
+            zIndex: 2,
+            width: '100%',
+            maxWidth: '100%'
           }}
         >
           <ButtonsGalery />
