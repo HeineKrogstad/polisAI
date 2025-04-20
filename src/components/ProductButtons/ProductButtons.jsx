@@ -1,6 +1,5 @@
 import { useTheme, useMediaQuery } from '@mui/material';
 import { ButtonsGalery } from './';
-import { MobileButtonsGalery } from './';
 
 const PRODUCT_TYPES = {
   OSAGO: {
@@ -36,10 +35,7 @@ const PRODUCT_TYPES = {
 };
 
 const ProductButtons = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  return isMobile ? <MobileButtonsGalery /> : <ButtonsGalery />;
+  return <ButtonsGalery />;
 };
 
 export default ProductButtons;
