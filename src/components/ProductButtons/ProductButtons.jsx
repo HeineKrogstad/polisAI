@@ -1,5 +1,6 @@
-import { Grid } from '@mui/material';
-import ProductButton from './ProductButton';
+import { useTheme, useMediaQuery } from '@mui/material';
+import { ButtonsGalery } from './';
+import { MobileButtonsGalery } from './';
 
 const PRODUCT_TYPES = {
   OSAGO: {
@@ -35,28 +36,10 @@ const PRODUCT_TYPES = {
 };
 
 const ProductButtons = () => {
-  return (
-    <Grid 
-      container 
-      spacing={2}
-      sx={{
-        justifyContent: 'center',
-        maxWidth: 'lg',
-        mx: 'auto',
-        px: 2
-      }}
-    >
-      {Object.values(PRODUCT_TYPES).map((product) => (
-        <Grid item xs={12} sm={6} md={4} lg={2} key={product.path}>
-          <ProductButton 
-            title={product.title}
-            path={product.path}
-            icon={product.icon}
-          />
-        </Grid>
-      ))}
-    </Grid>
-  );
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  return isMobile ? <MobileButtonsGalery /> : <ButtonsGalery />;
 };
 
 export default ProductButtons;
