@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
+    image: heinekrogstad/polisai:frontend
     ports:
       - "80:80"
       - "443:443"
@@ -18,9 +16,7 @@ services:
       - backend
 
   backend:
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
+    image: heinekrogstad/polisai:backend
     ports:
       - "5001:5001"
     environment:
