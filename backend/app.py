@@ -13,8 +13,8 @@ app = Flask(__name__)
 CORS(app)  # Включаем CORS для всех маршрутов
 
 # Конфигурация
-API_KEY = os.getenv('YANDEX_API_KEY')
-FOLDER_ID = os.getenv('YANDEX_FOLDER_ID')
+API_KEY = 'AQVN1-dqbkcvx68Hrv-edeaub_M8zaRemUMDcf3X'
+FOLDER_ID = 'b1gb1ftmtfh3fviu2qas'
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 
 # Инициализация Redis
