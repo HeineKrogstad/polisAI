@@ -24,6 +24,7 @@ services:
       - YANDEX_API_KEY=AQVN1-dqbkcvx68Hrv-edeaub_M8zaRemUMDcf3X
       - YANDEX_FOLDER_ID=b1gb1ftmtfh3fviu2qas
       - GRPC_DNS_RESOLVER=native
+      - GRPC_PYTHON_ENABLE_IPV6=0
     depends_on:
       - redis
 
