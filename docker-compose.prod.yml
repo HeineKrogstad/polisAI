@@ -17,20 +17,18 @@ services:
 
   backend:
     image: heinekrogstad/polisai:backend
-    # ports:
-    #   - "5001:5001"
-    network_mode: host
+    ports:
+      - "5001:5001"
     environment:
       - REDIS_URL=redis://redis:6379/0
       - YANDEX_API_KEY=AQVN1-dqbkcvx68Hrv-edeaub_M8zaRemUMDcf3X
       - YANDEX_FOLDER_ID=b1gb1ftmtfh3fviu2qas
-      # Настройки gRPC в Dockerfile уже есть
-      # - GRPC_DNS_RESOLVER=native
-      # - GRPC_PYTHON_ENABLE_IPV6=0
-    # sysctls:
-    #   - net.ipv6.conf.all.disable_ipv6=1
-    #   - net.ipv6.conf.default.disable_ipv6=1
-    #   - net.ipv6.conf.lo.disable_ipv6=1
+      - GRPC_DNS_RESOLVER=native
+      - GRPC_PYTHON_ENABLE_IPV6=0
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
+      - net.ipv6.conf.lo.disable_ipv6=1
     depends_on:
       - redis
 
