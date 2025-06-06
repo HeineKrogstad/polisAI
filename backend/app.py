@@ -7,6 +7,7 @@ import redis
 import json
 import logging
 import socket # Импортируем socket для сетевых проверок
+import grpc
 
 # Настройка логирования (если ее еще нет)
 # Если у вас уже есть настройка логирования, удалите или закомментируйте следующие строки
@@ -20,6 +21,11 @@ if not logger.handlers:
 # Принудительное использование IPv4
 socket.setdefaulttimeout(10)
 socket._socketobject = socket.socket
+
+# Настройка gRPC для использования только IPv4
+os.environ['GRPC_DNS_RESOLVER'] = 'native'
+os.environ['GRPC_PYTHON_ENABLE_IPV6'] = '0'
+os.environ['GRPC_ENABLE_FORK_SUPPORT'] = '0'
 
 # Функция для проверки сетевого подключения
 def check_yandex_api_connection():
@@ -70,10 +76,16 @@ REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 # Инициализация Redis
 redis_client = redis.from_url(REDIS_URL)
 
-# Инициализация SDK
+# Инициализация SDK с явным указанием использовать IPv4
 sdk = YCloudML(
     folder_id=FOLDER_ID,
     auth=API_KEY,
+    endpoint='api.yandex.ru:443',
+    channel_options=[
+        ('grpc.enable_http2_proxy', 0),
+        ('grpc.dns_resolver', 'native'),
+        ('grpc.enable_ipv6', 0)
+    ]
 )
 
 # Определяем модель YandexGPT
