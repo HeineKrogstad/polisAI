@@ -5,62 +5,6 @@ from dotenv import load_dotenv
 from yandex_cloud_ml_sdk import YCloudML
 import redis
 import json
-import logging
-import socket # Импортируем socket для сетевых проверок
-import grpc
-
-# Настройка логирования (если ее еще нет)
-# Если у вас уже есть настройка логирования, удалите или закомментируйте следующие строки
-# logging.basicConfig(level=logging.DEBUG)
-# logger = logging.getLogger(__name__)
-# Проверяем, есть ли уже настроенный логгер, чтобы не дублировать
-logger = logging.getLogger(__name__)
-if not logger.handlers:
-    logging.basicConfig(level=logging.DEBUG)
-
-# Принудительное использование IPv4
-socket.setdefaulttimeout(10)
-socket._socketobject = socket.socket
-
-# Настройка gRPC для использования только IPv4
-os.environ['GRPC_DNS_RESOLVER'] = 'native'
-os.environ['GRPC_PYTHON_ENABLE_IPV6'] = '0'
-os.environ['GRPC_ENABLE_FORK_SUPPORT'] = '0'
-
-# Функция для проверки сетевого подключения
-def check_yandex_api_connection():
-    yandex_host = 'api.yandex.ru'
-    yandex_port = 443
-    logger.debug(f"Attempting to connect to {yandex_host}:{yandex_port}")
-    try:
-        # Разрешение доменного имени в IP-адреса (только IPv4)
-        addr_info = socket.getaddrinfo(yandex_host, yandex_port, socket.AF_INET, socket.SOCK_STREAM)
-        logger.debug(f"Resolved {yandex_host} to addresses: {addr_info}")
-
-        # Попытка подключения к каждому адресу по очереди
-        for res in addr_info:
-            af, socktype, proto, canonname, sa = res
-            logger.debug(f"Trying to connect to address {sa} with address family {af}...")
-            try:
-                with socket.create_connection((sa[0], sa[1]), timeout=10) as s:
-                    logger.debug(f"Successfully connected to {sa}")
-                    # Если удалось подключиться хотя бы к одному адресу, считаем соединение успешным
-                    return True
-            except Exception as conn_err:
-                logger.debug(f"Failed to connect to {sa}: {conn_err}")
-                continue # Пробуем следующий адрес
-        
-        # Если ни одно соединение не удалось
-        logger.error("Failed to connect to any resolved address for {yandex_host}")
-        return False
-
-    except socket.gaierror as e:
-        logger.error(f"Address resolution error for {yandex_host}: {e}")
-        return False
-    except Exception as e:
-        logger.error(f"An unexpected error occurred during connection check: {e}", exc_info=True)
-        return False
-
 
 # Загрузка переменных окружения
 load_dotenv()
@@ -76,16 +20,10 @@ REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 # Инициализация Redis
 redis_client = redis.from_url(REDIS_URL)
 
-# Инициализация SDK с явным указанием использовать IPv4
+# Инициализация SDK
 sdk = YCloudML(
     folder_id=FOLDER_ID,
     auth=API_KEY,
-    endpoint='api.yandex.ru:443',
-    channel_options=[
-        ('grpc.enable_http2_proxy', 0),
-        ('grpc.dns_resolver', 'native'),
-        ('grpc.enable_ipv6', 0)
-    ]
 )
 
 # Определяем модель YandexGPT
@@ -104,7 +42,7 @@ def get_chat_history(session_id):
         return json.loads(history) if history else []
     except Exception as e:
         print(f"Ошибка при получении истории: {str(e)}")
-        return [] # Возвращаем пустой список при ошибке, чтобы не ломать чат
+        return []
 
 def save_chat_history(session_id, messages):
     """Сохранение истории чата в Redis"""
@@ -123,48 +61,37 @@ def chat():
         data = request.json
         message = data.get('message')
         session_id = data.get('session_id', 'default')
-
+        
         if not message:
             return jsonify({'error': 'Сообщение не может быть пустым'}), 400
-
-        # --- Добавленное логирование перед вызовом SDK ---
-        logger.info("Received chat message. Checking connection to Yandex API...")
-        if not check_yandex_api_connection():
-             logger.error("Yandex API connection check failed. Cannot proceed with model run.")
-             # Можно вернуть ошибку здесь, или продолжить и посмотреть, что выдаст SDK
-             # Для диагностики, давайте пока не возвращать ошибку сразу, а дождаться ошибки от SDK
-        else:
-             logger.info("Yandex API connection check successful.")
-        # --- Конец добавленного логирования ---
-
+        
         # Получаем текущую историю
         messages = get_chat_history(session_id)
-
+        
         # Формируем сообщения для модели
         model_messages = []
-
+        
         # Добавляем системный промпт
         model_messages.append({
             "role": "system",
             "text": SYSTEM_PROMPT["text"]
         })
-
+        
         # Добавляем историю сообщений
         model_messages.extend(messages)
-
+        
         # Добавляем текущее сообщение пользователя
         model_messages.append({
             "role": "user",
             "text": message
         })
-
+        
         # Отправляем запрос к модели
-        # Эта строка, вероятно, вызывает ошибку AioRpcError
         result = model.run(model_messages)
-
+        
         # Получаем ответ
         answer = result.alternatives[0].text
-
+        
         # Добавляем сообщение пользователя и ответ в историю
         messages.extend([
             {
@@ -176,15 +103,14 @@ def chat():
                 'text': answer
             }
         ])
-
+        
         # Сохраняем обновленную историю
         save_chat_history(session_id, messages)
-
+        
         return jsonify({'answer': answer})
 
     except Exception as e:
-        # Логируем оригинальную ошибку с traceback
-        logger.error(f"An error occurred in chat endpoint: {e}", exc_info=True)
+        print(f"Ошибка: {str(e)}")
         return jsonify({'error': f'Ошибка сервера: {str(e)}'}), 500
 
 @app.route('/api/history', methods=['GET'])
@@ -193,7 +119,7 @@ def get_history():
         session_id = request.args.get('session_id', 'default')
         messages = get_chat_history(session_id)
         return jsonify({'messages': messages})
-
+    
     except Exception as e:
         print(f"Ошибка при получении истории: {str(e)}")
         return jsonify({'error': f'Ошибка сервера: {str(e)}'}), 500
@@ -204,7 +130,7 @@ def clear_history():
         session_id = request.json.get('session_id', 'default')
         redis_client.delete(f"chat_history:{session_id}")
         return jsonify({'success': True})
-
+    
     except Exception as e:
         print(f"Ошибка при очистке истории: {str(e)}")
         return jsonify({'error': f'Ошибка сервера: {str(e)}'}), 500
